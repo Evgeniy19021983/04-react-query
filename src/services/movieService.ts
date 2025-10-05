@@ -1,27 +1,31 @@
 import axios from "axios";
-import type { Movie } from "../types/movie.ts";
 
-const BASE_URL = "https://api.themoviedb.org/3/search/movie";
+export interface Movie {
+  id: number;
+  title: string;
+  poster_path: string | null;
+  release_date: string;
+  overview: string;
+}
 
-interface MovieResponse {
-  results: Movie[];
-  total_pages: number;
-}
-export default async function movieService(
-  query: string,
-  page: number,
-): Promise<MovieResponse> {
-  const response = await axios.get<MovieResponse>(BASE_URL, {
-    params: {
-      query: query,
-      language: "en-US",
-      include_adult: "false",
-      page: page,
-    },
-    headers: {
-      accept: "application/json",
-      Authorization: `Bearer ${import.meta.env.VITE_TMDB_TOKEN}`,
-    },
-  });
-  return response.data;
-}
+const API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI0ZGQ3MTNhOWE3N2YyMTY4MjdhMTg5NWMyMTFhNWVkMCIsIm5iZiI6MTc1ODk3OTMxMi4zMzMsInN1YiI6IjY4ZDdlNGYwNjJkYjkzNmU5M2I0MGNhNiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Pn1Qqa8l4LtHElJnlRJunitHugPYfQdcWb_SpZwU4eM";
+const BASE_URL = "https://api.themoviedb.org/3";
+
+export const fetchMovies = async (query: string): Promise<Movie[]> => {
+  if (!query) return [];
+
+  try {
+    const response = await axios.get(`${BASE_URL}/search/movie`, {
+      params: {
+        api_key: API_KEY,
+        query,
+        language: "en-US",
+        include_adult: false,
+      },
+    });
+    return response.data.results;
+  } catch (error: any) {
+    console.error("Error fetching movies:", error.response?.data || error.message);
+    throw new Error("Failed to fetch movies");
+  }
+};

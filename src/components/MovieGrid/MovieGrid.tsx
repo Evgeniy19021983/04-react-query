@@ -1,27 +1,30 @@
-import css from "./MovieGrid.module.css";
-import type { Movie } from "../../types/movie.ts";
+import { Movie } from "../../services/movieService";
 
-interface MovieGridProps {
-  onSelect: (movie: Movie) => void;
+interface Props {
   movies: Movie[];
 }
 
-export default function MovieGrid({ onSelect, movies }: MovieGridProps) {
-  return movies.length === 0 ? null : (
-    <ul className={css.grid}>
+const MovieGrid = ({ movies }: Props) => {
+  if (!movies.length) return <p>No movies found.</p>;
+
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "16px" }}>
       {movies.map((movie) => (
-        <li key={movie.id} onClick={() => onSelect(movie)}>
-          <div className={css.card}>
-            <img
-              className={css.image}
-              src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
-              alt={movie.title}
-              loading="lazy"
-            />
-            <h2 className={css.title}>{movie.title}</h2>
-          </div>
-        </li>
+        <div key={movie.id}>
+          <img
+            src={
+              movie.poster_path
+                ? `https://image.tmdb.org/t/p/w200${movie.poster_path}`
+                : "https://via.placeholder.com/200x300?text=No+Image"
+            }
+            alt={movie.title}
+          />
+          <h3>{movie.title}</h3>
+          <p>{movie.release_date}</p>
+        </div>
       ))}
-    </ul>
+    </div>
   );
-}
+};
+
+export default MovieGrid;
